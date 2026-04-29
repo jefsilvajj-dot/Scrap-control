@@ -1,1 +1,153 @@
+<!DOCTYPE html>
 
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Scrap">
+<meta name="theme-color" content="#0f1117">
+<title>Scrap Control</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Bebas+Neue&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0f1117;color:#ddd8cf;font-family:'IBM Plex Mono',monospace;min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,16px)}
+::-webkit-scrollbar{width:4px;background:#0f1117}
+::-webkit-scrollbar-thumb{background:#ff4d1c;border-radius:3px}
+#header{background:#0d0f1a;border-bottom:1px solid #1e2233;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));position:sticky;top:0;z-index:10}
+#header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+#brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:6px;color:#ff4d1c}
+#sub{font-size:7px;color:#444;letter-spacing:3px}
+#save-ind{font-size:8px;color:#22c55e;letter-spacing:1px;opacity:0;transition:opacity .4s}
+#chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:3px;background:#16192a;border:1px solid #1e2233;padding:2px 6px;border-radius:2px;font-size:8px}
+.chip-p{color:#22c55e;font-weight:700}
+#tabs{display:flex;padding:12px 16px 0}
+.tab{flex:1;background:transparent;border:1.5px solid #252840;color:#666;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;padding:8px 4px;transition:all .2s}
+.tab:first-child{border-radius:2px 0 0 2px}
+.tab:last-child{border-radius:0 2px 2px 0;border-left:none}
+.tab:nth-child(2){border-left:none}
+.tab.active{background:#ff4d1c;border-color:#ff4d1c;color:#0f1117}
+#content{padding:16px}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:4px;color:#ff4d1c}
+.nav-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.nb{background:#16192a;border:1px solid #252840;color:#666;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;border-radius:2px;flex-shrink:0}
+.nav-lbl{font-size:10px;color:#888;min-width:130px;text-align:center}
+.today-b{font-size:8px;color:#22c55e;letter-spacing:2px}
+.card{background:#0d0f1a;border:1px solid #1e2233;border-radius:4px;overflow:hidden}
+.tbl-head{display:grid;background:#080a12;border-bottom:1px solid #1e2233}
+.th{font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#444;padding:6px 6px;white-space:nowrap}
+.glbl{font-size:7px;letter-spacing:2px;color:#ff4d1c99;text-transform:uppercase;padding:4px 8px;background:#080a12;border-top:1px solid #141627}
+.drow{display:grid;border-top:1px solid #141627}
+.cell{padding:4px 5px;border-left:1px solid #141627;display:flex;align-items:center;justify-content:center}
+.cell:first-child{border-left:none;justify-content:flex-start}
+.mn{font-size:10px;font-weight:700}
+.mp{font-size:8px;color:#555}
+.trow{display:grid;border-top:2px solid #ff4d1c22;background:#080a12}
+input[type=number]{background:#16192a;border:1px solid #252840;color:#e0dfd8;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;text-align:center;padding:5px 3px;outline:none;border-radius:2px;-webkit-appearance:none}
+input[type=number]:focus{border-color:#ff4d1c}
+input[type=number].saved{border-color:#22c55e;background:#0e1c10}
+input[type=date]{background:#16192a;border:1px solid #252840;color:#ddd;padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;outline:none;border-radius:2px;-webkit-appearance:none}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+.cv{color:#22c55e;font-weight:700}
+.qv{color:#ff4d1c;font-weight:700}
+.day-tot{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid #ff4d1c22;background:#080a12}
+.day-tot-lbl{font-size:8px;letter-spacing:2px;color:#666}
+.day-tot-val{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#22c55e}
+.month-ban{margin-top:12px;background:#091409;border:1px solid #22c55e33;border-radius:4px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.mb-lbl{font-size:7px;letter-spacing:3px;color:#22c55e;margin-bottom:4px}
+.mb-sub{font-size:8px;color:#444}
+.mb-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#22c55e}
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+.sc{background:#0d0f1a;border:1px solid #1e2233;border-radius:4px;padding:11px}
+.sc-icon{font-size:14px;margin-bottom:3px}
+.sc-lbl{font-size:8px;color:#666;margin-bottom:2px}
+.sc-qty{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#ff4d1c}
+.sc-cost{font-size:11px;color:#22c55e;font-weight:700;margin-top:4px;padding-top:4px;border-top:1px solid #1a1d2e}
+.sc-meta{font-size:7px;color:#444;margin-top:3px}
+.wsum{background:#0d0f1a;border:1px solid #ff4d1c33;border-radius:4px;padding:14px 16px;margin-top:12px}
+.wsum-t{font-size:7px;letter-spacing:3px;color:#ff4d1c;margin-bottom:12px}
+.wcards{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+.wc{background:#080a12;border:1px solid #141627;border-radius:3px;padding:8px 9px}
+.wc-l{font-size:7px;color:#444;margin-bottom:2px}
+.wc-q{font-size:12px;font-weight:700;color:#ff4d1c}
+.wc-c{font-size:9px;color:#22c55e;font-weight:700;margin-top:1px}
+.wtot{border-top:1px solid #1e2233;padding-top:12px;display:flex;justify-content:space-between;align-items:center}
+.wtot-l{font-size:8px;letter-spacing:2px;color:#666}
+.wtot-v{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#22c55e}
+.sw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.hint{margin-top:6px;font-size:8px;color:#333;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div id="header">
+  <div id="header-top">
+    <div><div id="brand">SCRAP CONTROL</div><div id="sub">PRODUÇÃO · QUALIDADE · RASTREABILIDADE</div></div>
+    <div id="save-ind">✓ SALVO</div>
+  </div>
+  <div id="chips"></div>
+</div>
+<div id="tabs">
+  <button class="tab active" onclick="setTab('daily')">Diário</button>
+  <button class="tab" onclick="setTab('weekly')">Semanal</button>
+  <button class="tab" onclick="setTab('monthly')">Mensal</button>
+</div>
+<div id="content"></div>
+<script>
+const ITEMS=[
+  {id:"caixa500",label:"Caixa 500ml",icon:"📦",price:2.54},
+  {id:"caixa700",label:"Caixa 700ml",icon:"📦",price:5.12},
+  {id:"caixaRM",label:"Caixa Room Mist",icon:"📦",price:2.60},
+  {id:"frasco500",label:"Frasco 500ml",icon:"🧴",price:1.92},
+  {id:"frasco750",label:"Frasco 750ml",icon:"🧴",price:2.95},
+  {id:"frascoRM",label:"Frasco Room Mist",icon:"🧴",price:1.29},
+  {id:"rotulo500",label:"Rótulo 500ml",icon:"🏷️",price:0.17},
+  {id:"rotulo750",label:"Rótulo 750ml",icon:"🏷️",price:0.18},
+  {id:"rotuloRM",label:"Rótulo Room Mist",icon:"🏷️",price:0.16},
+  {id:"tampa",label:"Tampa",icon:"🔵",price:0.21},
+  {id:"triggerRM",label:"Trigger Room Mist",icon:"🔫",price:1.13},
+  {id:"batoque",label:"Batoque",icon:"🔩",price:0.12},
+];
+const GROUPS=[
+  {label:"Caixas",ids:["caixa500","caixa700","caixaRM"]},
+  {label:"Frascos",ids:["frasco500","frasco750","frascoRM"]},
+  {label:"Rótulos",ids:["rotulo500","rotulo750","rotuloRM"]},
+  {label:"Outros",ids:["tampa","triggerRM","batoque"]},
+];
+const WD=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+const MN=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const KEY="scrap_v1";
+let DB={};
+try{DB=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){DB={}}
+function save(){localStorage.setItem(KEY,JSON.stringify(DB));const el=document.getElementById("save-ind");el.style.opacity="1";clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity="0",1400);}
+function get(date,id){return DB[date]?.[id]??0}
+function set(date,id,raw){const n=Math.max(0,parseFloat(raw)||0);if(!DB[date])DB[date]={};if(n===0){delete DB[date][id];if(!Object.keys(DB[date]).length)delete DB[date];}else DB[date][id]=n;save();}
+const R=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const iso=d=>d.toISOString().split("T")[0];
+const today=()=>iso(new Date());
+function weekOf(a){const d=new Date(a+"T12:00:00"),dow=d.getDay();const m=new Date(d);m.setDate(d.getDate()-dow+(dow===0?-6:1));return Array.from({length:7},(_,i)=>{const x=new Date(m);x.setDate(m.getDate()+i);return iso(x)});}
+function monthOf(a){const d=new Date(a+"T12:00:00"),y=d.getFullYear(),mo=d.getMonth();return Array.from({length:new Date(y,mo+1,0).getDate()},(_,i)=>iso(new Date(y,mo,i+1)));}
+const dl=d=>{const x=new Date(d+"T12:00:00");return x.getDate()+"/"+(x.getMonth()+1)};
+const dw=d=>["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d+"T12:00:00").getDay()];
+const isWE=d=>{const x=new Date(d+"T12:00:00").getDay();return x===0||x===6};
+const sumQ=(ds,id)=>ds.reduce((a,d)=>a+get(d,id),0);
+const sumC=(ds,id)=>sumQ(ds,id)*ITEMS.find(i=>i.id===id).price;
+const totC=ds=>ITEMS.reduce((a,it)=>a+sumC(ds,it.id),0);
+const dayC=d=>ITEMS.reduce((a,it)=>a+get(d,it.id)*it.price,0);
+let TAB="daily",DAY=today(),WANC=today(),MANC=today();
+document.getElementById("chips").innerHTML=ITEMS.map(it=>`<div class="chip">${it.icon} ${it.label} <span class="chip-p">${R(it.price)}</span></div>`).join("");
+function chg(el){set(el.dataset.date,el.dataset.id,el.value);el.classList.add("saved");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("saved"),700);updateTotals();}
+function inp(date,id,style=""){const v=get(date,id);return `<input type="number" min="0" placeholder="0" value="${v||""}" style="${style}" data-date="${date}" data-id="${id}" oninput="chg(this)" onfocus="this.select()">"`;}
+function updateTotals(){if(TAB==="daily"){ITEMS.forEach(it=>{const el=document.getElementById("dc-"+it.id);if(el){const q=get(DAY,it.id);el.textContent=q>0?R(q*it.price):"—";}});const b=document.getElementById("dtv");if(b)b.textContent=R(dayC(DAY));}else render(true);}
+function daily(){const t=today();let h=`<div class="nav-row"><span class="sec-title">REGISTRO DIÁRIO</span><input type="date" value="${DAY}" onchange="DAY=this.value;render()">${DAY===t?'<span class="today-b">● HOJE</span>':""}</div><div class="card"><div class="tbl-head" style="grid-template-columns:1fr 90px 75px 90px"><div class="th">MATERIAL</div><div class="th" style="text-align:center">QTD</div><div class="th" style="text-align:center;color:#555">UNIT.</div><div class="th" style="text-align:center;color:#22c55e">TOTAL</div></div>`;GROUPS.forEach(g=>{h+=`<div class="glbl">▸ ${g.label}</div>`;g.ids.forEach((id,i)=>{const it=ITEMS.find(x=>x.id===id),q=get(DAY,id),c=q*it.price;h+=`<div class="drow" style="grid-template-columns:1fr 90px 75px 90px${i>0?";border-top:1px solid #141627":""}"><div class="cell" style="gap:6px;padding:9px 8px"><span style="font-size:13px">${it.icon}</span><div><div class="mn">${it.label}</div></div></div><div class="cell">${inp(DAY,id)}</div><div class="cell mp">${R(it.price)}</div><div class="cell cv" id="dc-${id}" style="font-size:11px">${c>0?R(c):"—"}</div></div>`;});});h+=`<div class="day-tot"><span class="day-tot-lbl">CUSTO TOTAL DO DIA</span><span class="day-tot-val" id="dtv">${R(dayC(DAY))}</span></div></div><div class="hint">Os valores são salvos automaticamente</div>`;return h;}
+function weekly(){const t=today(),wd=weekOf(WANC);let h=`<div class="nav-row"><span class="sec-title">VISÃO SEMANAL</span><button class="nb" onclick="WANC=shiftW(WANC,-1);render()">←</button><span class="nav-lbl">${dl(wd[0])} – ${dl(wd[6])}/${new Date(wd[6]+"T12:00:00").getFullYear()}</span><button class="nb" onclick="WANC=shiftW(WANC,1);render()">→</button></div><div class="sw"><div class="card" style="min-width:680px"><div class="tbl-head" style="grid-template-columns:130px repeat(7,1fr) 62px 92px"><div class="th">MATERIAL</div>`;wd.forEach((d,i)=>{const isT=d===t;h+=`<div class="th" style="text-align:center${isT?";color:#ff4d1c":""}">${WD[i]}${isT?" ●":""}<br><span style="font-size:6px;color:#555">${dl(d)}</span></div>`;});h+=`<div class="th" style="text-align:center;color:#ff4d1c">QTD</div><div class="th" style="text-align:center;color:#22c55e">CUSTO</div></div>`;GROUPS.forEach(g=>{h+=`<div class="glbl">▸ ${g.label}</div>`;g.ids.forEach(id=>{const it=ITEMS.find(x=>x.id===id);h+=`<div class="drow" style="grid-template-columns:130px repeat(7,1fr) 62px 92px"><div class="cell" style="gap:5px;padding:7px 7px;border-left:none"><span>${it.icon}</span><div><div class="mn" style="font-size:9px">${it.label}</div><div class="mp">${R(it.price)}/un</div></div></div>`;wd.forEach(date=>{h+=`<div class="cell"${date===t?' style="background:#191408"':""}>${inp(date,id,"font-size:10px;padding:3px 2px")}</div>`;});h+=`<div class="cell qv" style="font-size:11px">${sumQ(wd,id).toLocaleString("pt-BR")}</div><div class="cell cv" style="font-size:10px">${R(sumC(wd,id))}</div></div>`;});});h+=`<div class="trow" style="grid-template-columns:130px repeat(7,1fr) 62px 92px"><div class="th" style="color:#ff4d1c;border-bottom:none">TOTAL</div>`;wd.forEach(d=>{const dc=dayC(d);h+=`<div class="cell cv" style="font-size:8px;padding:8px 2px">${dc>0?R(dc):"—"}</div>`;});h+=`<div class="cell"></div><div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:#22c55e">${R(totC(wd))}</div></div></div></div><div class="hint">← Deslize para ver todos os dias →</div><div class="wsum"><div class="wsum-t">◆ RESUMO DA SEMANA</div><div class="wcards">`;ITEMS.forEach(it=>{h+=`<div class="wc"><div class="wc-l">${it.icon} ${it.label}</div><div class="wc-q">${sumQ(wd,it.id).toLocaleString("pt-BR")} <span style="font-size:8px;color:#666">un</span></div><div class="wc-c">${R(sumC(wd,it.id))}</div></div>`;});h+=`</div><div class="wtot"><span class="wtot-l">CUSTO TOTAL DA SEMANA</span><span class="wtot-v">${R(totC(wd))}</span></div></div>`;return h;}
+function monthly(){const t=today(),md=monthOf(MANC);const dx=new Date(MANC+"T12:00:00");const ml=MN[dx.getMonth()]+" "+dx.getFullYear();let h=`<div class="nav-row"><span class="sec-title">VISÃO MENSAL</span><button class="nb" onclick="MANC=shiftM(MANC,-1);render()">←</button><span class="nav-lbl" style="letter-spacing:1px">${ml}</span><button class="nb" onclick="MANC=shiftM(MANC,1);render()">→</button></div><div class="sw"><div class="card" style="min-width:900px"><div class="tbl-head" style="grid-template-columns:44px repeat(12,1fr) 90px"><div class="th">DIA</div>`;ITEMS.forEach(it=>{h+=`<div class="th" style="text-align:center;font-size:6px">${it.icon} ${it.label}</div>`;});h+=`<div class="th" style="text-align:center;color:#22c55e">CUSTO</div></div>`;md.forEach((date,i)=>{const isT=date===t,dc=dayC(date);h+=`<div class="drow" style="grid-template-columns:44px repeat(12,1fr) 90px;${isT?"background:#191408;border-left:2px solid #ff4d1c":isWE(date)?"background:#0b0d18":"border-left:2px solid transparent"}${i>0?";border-top:1px solid #111320":""}"><div class="cell" style="flex-direction:column;align-items:flex-start;padding:4px 5px;border-left:none"><span style="font-size:10px;font-weight:700;color:${isT?"#ff4d1c":"#ccc"}">${new Date(date+"T12:00:00").getDate()}</span><span style="font-size:7px;color:#444">${dw(date)}</span></div>`;ITEMS.forEach(it=>{h+=`<div class="cell" style="padding:3px 2px">${inp(date,it.id,"font-size:9px;padding:2px 1px")}</div>`;});h+=`<div class="cell cv" style="font-size:9px">${dc>0?R(dc):"—"}</div></div>`;});h+=`<div class="trow" style="grid-template-columns:44px repeat(12,1fr) 90px"><div class="th" style="color:#ff4d1c;border-bottom:none;font-size:7px">TOTAL</div>`;ITEMS.forEach(it=>{h+=`<div class="cell" style="flex-direction:column;gap:1px;padding:7px 2px"><span class="qv" style="font-size:9px">${sumQ(md,it.id).toLocaleString("pt-BR")}</span><span class="cv" style="font-size:7px">${R(sumC(md,it.id))}</span></div>`;});h+=`<div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:#22c55e">${R(totC(md))}</div></div></div></div><div class="hint">← Deslize para ver todos os materiais →</div><div class="cgrid">`;ITEMS.forEach(it=>{const q=sumQ(md,it.id),c=sumC(md,it.id),dias=md.filter(d=>get(d,it.id)>0).length;h+=`<div class="sc"><div class="sc-icon">${it.icon}</div><div class="sc-lbl">${it.label}</div><div class="sc-qty">${q.toLocaleString("pt-BR")} <span style="font-size:8px;font-family:'IBM Plex Mono';color:#555">un</span></div><div class="sc-cost">${R(c)}</div><div class="sc-meta">${R(it.price)}/un · Média: ${dias>0?(q/dias).toFixed(1):"—"} un/dia · ${dias} dias</div></div>`;});const diasC=md.filter(d=>dayC(d)>0).length;h+=`</div><div class="month-ban"><div><div class="mb-lbl">◆ CUSTO TOTAL DO MÊS</div><div class="mb-sub">${ml} · ${diasC} dias com registros</div></div><div class="mb-val">${R(totC(md))}</div></div>`;return h;}
+function shiftW(a,d){const x=new Date(a+"T12:00:00");x.setDate(x.getDate()+d*7);return iso(x)}
+function shiftM(a,d){const x=new Date(a+"T12:00:00");x.setMonth(x.getMonth()+d);return iso(x)}
+function render(soft){const el=document.getElementById("content");if(TAB==="daily")el.innerHTML=daily();if(TAB==="weekly")el.innerHTML=weekly();if(TAB==="monthly")el.innerHTML=monthly();if(!soft)window.scrollTo(0,0);}
+function setTab(t){TAB=t;document.querySelectorAll(".tab").forEach((el,i)=>el.classList.toggle("active",["daily","weekly","monthly"][i]===t));render();}
+render();
+</script>
+</body>
+</html>
